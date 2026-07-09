@@ -1,0 +1,30 @@
+services:
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.60.0-noble # Version must match requirements.txt
+    container_name: playwright
+    command: npx -y playwright@1.60.0 run-server --port 3000 --host 0.0.0.0
+
+  open-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+#      - GLOBAL_LOG_LEVEL=DEBUG
+#      - LOG_FORMAT=json
+#      - AUDIT_LOG_LEVEL=REQUEST_RESPONSE
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - WEBUI_SECRET_KEY=
+#      - RAG_SYSTEM_CONTEXT=True
+      - WEB_LOADER_ENGINE=playwright
+      - PLAYWRIGHT_WS_URL=ws://playwright:3000
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - open-webui:/app/backend/data
+    restart: unless-stopped
+
+volumes:
+  open-webui:
