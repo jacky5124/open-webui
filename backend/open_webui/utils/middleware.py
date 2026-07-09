@@ -1985,14 +1985,11 @@ def get_reasoning_format(model: dict) -> str | None:
     Determine how reasoning should be included in reconstructed messages.
 
     Returns:
-        'think_tags': Ollama expects <think> tags in content.
-        'reasoning_content': llama.cpp supports reasoning_content as a top-level field.
+        'reasoning_content': Ollama and llama.cpp supports reasoning_content as a top-level field.
         None: skip reasoning (safe default for strict providers).
     """
-    provider = model.get('provider', '')
-    if provider == 'ollama':
-        return 'think_tags'
-    if provider == 'llama.cpp':
+    if (model.get('owned_by', '') == 'ollama'
+            or model.get('provider', '') == 'llama.cpp'):
         return 'reasoning_content'
     return None
 
